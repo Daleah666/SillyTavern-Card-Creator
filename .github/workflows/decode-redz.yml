@@ -1,0 +1,26 @@
+name: decode-redz
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'creator/redz.webp.b64'
+jobs:
+  decode:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Decode webp and commit
+        run: |
+          set -euo pipefail
+          if [ ! -f creator/redz.webp.b64 ]; then echo 'no b64'; exit 0; fi
+          if [ -f creator/redz.webp ]; then echo 'webp exists'; exit 0; fi
+          base64 -d creator/redz.webp.b64 > creator/redz.webp
+          rm -f creator/redz.webp.b64
+          rm -f .github/workflows/decode-redz.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Add creator/redz.webp (decoded) and remove transport files'
+          git push
