@@ -578,3 +578,61 @@ body.stcc-left-open #sheld{margin-left:var(--stcc-left-w,0)}
     margin-top: 6px;
     opacity: 0.6;
 }
+
+/* ---------------- Duet rail (left) additions ---------------- */
+.stcc-sec{display:flex;flex-direction:column;gap:4px}
+.stcc-sech{display:flex;align-items:center;gap:8px;background:none;border:0;color:#aab;font-size:.62em;letter-spacing:.14em;text-transform:uppercase;font-weight:600;padding:6px 0 2px;cursor:pointer;text-align:left}
+.stcc-sech .dot{width:6px;height:6px;border-radius:50%;background:var(--c,#ff7cbf);box-shadow:0 0 8px var(--c,#ff7cbf)}.stcc-sech small{color:#778;font-weight:500}.stcc-sech .chev{margin-left:auto;font-style:normal;color:#778}
+.stcc-list{display:flex;flex-direction:column;gap:3px}
+.stcc-item{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:5px 8px;color:#e8ecf4;cursor:pointer;font:inherit}
+.stcc-item:hover{border-color:color-mix(in srgb,var(--c,#ff7cbf) 50%,transparent)}.stcc-item.on{border-color:var(--c,#ff7cbf);background:color-mix(in srgb,var(--c,#ff7cbf) 10%,transparent)}
+.stcc-item img{width:30px;height:30px;border-radius:50%;object-fit:cover;object-position:top;flex:none}.stcc-item span{display:flex;flex-direction:column;min-width:0;flex:1}.stcc-item b{font-size:.84em;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stcc-item small{font-size:.7em;color:#99a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stcc-item i{font-style:normal;font-size:.5em;letter-spacing:.14em;color:var(--c,#ff7cbf);border:1px solid currentColor;border-radius:999px;padding:1px 6px}
+.stcc-strip{display:flex;gap:6px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:thin}.stcc-strip .stcc-tile{flex:none;width:92px}.stcc-tile.sm{width:84px}
+.stcc-me{display:flex;align-items:center;gap:10px;margin-top:auto;padding:8px 10px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.03)}.stcc-me img{width:34px;height:34px;border-radius:50%;object-fit:cover}.stcc-me b{display:block;font-size:.86em}.stcc-me small{color:#99a;font-size:.72em}
+.stcc-row{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.stcc-row label{display:flex;align-items:center;gap:4px;font-size:.76em;color:#aab}.stcc-row .stcc-grow{flex:1}.stcc-row input,.stcc-row select,.stcc-fld textarea,.stcc-fld input{font:inherit;font-size:.86em;color:#e8ecf4;background:rgba(0,0,0,.3);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px 8px;min-width:0}.stcc-row .stcc-grow input{width:100%}
+.stcc-row button,.stcc-db .stcc-row button{font:inherit;font-size:.78em;color:#e8ecf4;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.16);border-radius:999px;padding:4px 11px;cursor:pointer}.stcc-row button:hover{border-color:var(--c,#ff7cbf)}
+.stcc-tg{display:flex;align-items:center;gap:8px;font-size:.84em;color:#dde;cursor:pointer}.stcc-tg input{accent-color:var(--c,#ff7cbf)}
+.stcc-fld{display:flex;flex-direction:column;gap:3px}.stcc-fld>span{font-size:.62em;letter-spacing:.12em;text-transform:uppercase;color:#99a}.stcc-fld>span small{letter-spacing:0;text-transform:none;color:#778}.stcc-fld textarea{width:100%;resize:vertical;line-height:1.4}
+/* ticker */
+.stcc-tick{display:flex;align-items:center;gap:8px;height:24px;padding:0 8px;border-radius:999px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);overflow:hidden;flex:none}
+.stcc-ttrack{flex:1;min-width:0;display:inline-flex;gap:18px;white-space:nowrap;-webkit-mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.stcc-ttrack.roll{animation:stccroll 24s linear infinite}@keyframes stccroll{to{transform:translateX(-50%)}}.stcc-tick:hover .stcc-ttrack{animation-play-state:paused}
+.stcc-ttrack i{font-style:normal;font-size:.6em;letter-spacing:.04em;color:#aab;white-space:nowrap}.stcc-ttrack i.her{color:#fff}.stcc-ttrack i.you{color:#c9f07a}
+.stcc-tn{display:inline-flex;gap:8px;border-left:1px solid rgba(255,255,255,.1);padding-left:8px}.stcc-tn b{font-size:.62em;font-weight:600;display:inline-flex;gap:3px;align-items:baseline}.stcc-tn small{font-size:.5em;letter-spacing:.08em;text-transform:uppercase;color:#99a}
+/* subliminals */
+#stcc-subl{position:fixed;inset:0;z-index:2500;pointer-events:none;overflow:hidden}
+#stcc-subl span{position:absolute;transform:translate(-50%,-50%);font-weight:700;font-size:clamp(1.3rem,3vw,2.6rem);letter-spacing:.04em;text-transform:uppercase;color:#fff;text-shadow:0 0 18px rgba(255,124,191,.6);opacity:0;animation:stccflash var(--ms,70ms) steps(1,end) both;white-space:nowrap}
+#stcc-subl span.soft{animation:stccdrift var(--ms,1800ms) ease-in-out both;text-transform:none;font-weight:500;font-style:italic}
+@keyframes stccflash{0%{opacity:var(--a,.3)}100%{opacity:0}}@keyframes stccdrift{0%{opacity:0;transform:translate(-50%,-42%)}22%{opacity:var(--a,.3)}78%{opacity:var(--a,.3)}100%{opacity:0;transform:translate(-50%,-58%)}}
+
+/* 💗 Right now (heart.js), from 0.1.5 */
+#stcc-now { display: grid; gap: 8px; }
+.stcc-now-head { display: flex; align-items: center; gap: 8px; }
+.stcc-now-head b { font-size: 0.92rem; flex: 1; }
+.stcc-now-stage { font: 500 0.58rem 'IBM Plex Mono', ui-monospace, monospace; letter-spacing: 0.12em; text-transform: uppercase; color: #ff7cbf; border: 1px solid rgba(255, 124, 191, 0.5); border-radius: 999px; padding: 3px 9px; }
+.stcc-now-ln { display: grid; grid-template-columns: 1.2rem minmax(0, 1fr) auto; gap: 6px; align-items: start; line-height: 1.35; }
+.stcc-now-ln .t { min-width: 0; overflow-wrap: anywhere; }
+.stcc-now-ln .think { font-style: italic; color: rgba(232, 236, 244, 0.78); }
+.stcc-now-ln .stcc-icon { padding: 0 7px; min-height: 0; line-height: 1.5; }
+.stcc-now-stagerow { display: flex; align-items: baseline; gap: 8px; margin-top: 2px; }
+.stcc-now-stagerow small { margin-left: auto; color: rgba(232, 236, 244, 0.5); font-size: 0.72rem; }
+.stcc-now-bars { display: grid; gap: 5px; }
+.stcc-now-bar { display: grid; grid-template-columns: 7.2rem minmax(0, 1fr) 2rem; gap: 8px; align-items: center; font-size: 0.8rem; }
+.stcc-now-bar .tr { height: 7px; border-radius: 99px; background: rgba(255, 255, 255, 0.1); overflow: hidden; }
+.stcc-now-bar .tr i { display: block; height: 100%; border-radius: 99px; transition: width 0.5s; }
+.stcc-now-bar small { text-align: right; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 0.72rem; color: rgba(232, 236, 244, 0.75); }
+.stcc-now-bar input[type='range'] { width: 100%; accent-color: #ff7cbf; margin: 0; }
+.stcc-now-sw { display: flex; align-items: center; gap: 8px; font-size: 0.78rem; color: rgba(232, 236, 244, 0.78); cursor: pointer; padding-top: 4px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+.stcc-now-sw input { accent-color: #ff7cbf; }
+.stcc-now-log { display: grid; gap: 3px; }
+.stcc-now-log .r { display: flex; gap: 6px; align-items: center; font-size: 0.72rem; color: rgba(232, 236, 244, 0.75); min-width: 0; }
+.stcc-now-log .r small { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.stcc-pill { display: inline-flex; align-items: center; gap: 4px; font: 500 0.62rem 'IBM Plex Mono', ui-monospace, monospace; padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.16); color: rgba(232, 236, 244, 0.8); background: rgba(0, 0, 0, 0.25); margin-top: 6px; }
+.stcc-pill.good { border-color: rgba(134, 239, 172, 0.55); color: #bff5d0; }
+.stcc-pill.bad { border-color: rgba(255, 144, 144, 0.55); color: #ffc2c2; }
+
+/* 0.3.2: the dock body scrolls; its rows never squash (the tab row used to collapse to 1px once her panel was taller than the screen) */
+.stcc-db > * { flex-shrink: 0; }
+/* 0.3.2: a hidden About tab stays hidden (a section rule made every tab show at once) */
+.stcc-dock [hidden] { display: none !important; }

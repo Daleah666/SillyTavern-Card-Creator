@@ -1,10 +1,12 @@
-# st-card-creator · Duet Stage panels for SillyTavern (0.2.0)
+# st-card-creator · Duet Stage panels for SillyTavern (0.3.2)
 
 Install in SillyTavern: Extensions (the blocks icon) → **Install extension** → paste `https://github.com/Daleah666/SillyTavern-Card-Creator`. This repo holds the extension at its root.
 
-What you get: two top-bar buttons. **Library** (left dock): her avatar, sprite pack and chat images; hover to enlarge, right-click to send/open/copy, drop a picture to add a sprite. **About** (right dock): hero portrait, talks meter, Overview, Sheet (flat vitals and quirks), Inner voice, Connection. Drag the dock edge to resize; Ctrl+wheel scales its text.
+What you get: two top-bar buttons. **Duet** (left dock): the Duet rail with coloured collapsible sections for Characters, Chats (open a chat, fork, summarize), Latest pictures and a Library tab (avatar, sprite pack, chat images; hover to enlarge, right-click to emote/send/open/copy, drop a picture to add a sprite). **About** (right dock): live ticker, hero portrait, talks meter and tabs for Overview, Sheet (flat vitals and quirks), Reel + idle playlist, Story and memories, Inner voice, Subliminals, Connection and Settings. Drag the dock edge to resize; Ctrl+wheel scales only the dock's text. The Card creator itself (the Duet Stage tab, or a standalone drawer when st-duet-stage is not installed) is unchanged.
 
 Manual install: copy this folder into `data/default-user/extensions/third-party/st-card-creator/` and reload.
+
+**💗 Right now** (About dock, 0.3.2, from 0.1.5): her mood, a thought, her outfit and six relationship bars (Affection, Trust, Spark, Comfort, Jealousy, Energy) with a stage name. 💞 *Score every reply* (off until you turn it on) judges each of her messages with one quiet call on your connection and moves the bars, with a little pill under her message. 🗣 *She knows where you two stand* adds a short note to her prompt. Saved per character in `extensionSettings['st-card-creator'].hearts`, the same place 0.1.5 kept them.
 
 ## Auto-update and the 📣 board
 
