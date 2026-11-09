@@ -1,0 +1,14 @@
+{
+    "display_name": "Card creator (Duet Stage tab)",
+    "loading_order": 230,
+    "requires": [],
+    "optional": [
+        "st-duet-stage"
+    ],
+    "js": "index.js",
+    "css": "style.css",
+    "author": "Companion Project",
+    "version": "0.2.1",
+    "auto_update": false,
+    "homePage": "https://github.com/Daleah666/SillyTavern-Card-Creator"
+}

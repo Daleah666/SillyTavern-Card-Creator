@@ -1,0 +1,580 @@
+/* Card creator tab inside #duet-side-panel (owned by st-duet-stage; styled from here only). */
+.stcc-tabs {
+    display: flex;
+    gap: 6px;
+    flex: none;
+    margin: 0 0 2px;
+}
+.stcc-tabs button,
+.stcc-bar button,
+.stcc-modal-card button,
+.stcc-file {
+    font: inherit;
+    font-size: 0.82rem;
+    color: #e8ecf4;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 999px;
+    padding: 4px 11px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.stcc-tabs button.active {
+    background: rgba(255, 120, 190, 0.22);
+    border-color: rgba(255, 140, 200, 0.7);
+    color: #fff;
+}
+.stcc-tabs button:hover,
+.stcc-bar button:hover,
+.stcc-modal-card button:hover,
+.stcc-file:hover {
+    border-color: rgba(255, 140, 200, 0.8);
+}
+.stcc-primary {
+    background: linear-gradient(135deg, #ff5fa2, #c06bff) !important;
+    border-color: transparent !important;
+    color: #fff !important;
+    font-weight: 600;
+}
+.stcc-primary:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+.stcc-icon {
+    padding: 4px 8px !important;
+}
+
+/* Creator tab active: hide the rail content, give the pane the column.
+   Force a definite panel height — without it, flex children collapse to ~padding
+   (top/bottom stretch can lose to content-sized height when the rail body is hidden). */
+#duet-side-panel.stcc-on > *:not(.duet-sp-resize):not(#stcc-tabs):not(#stcc-pane):not(#stcc-stage):not(.stcc-sa-head) {
+    display: none !important;
+}
+#duet-side-panel.stcc-on {
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: calc(100vh - 48px) !important;
+    max-height: calc(100vh - 48px) !important;
+}
+#duet-side-panel.stcc-on.stcc-wide {
+    width: min(1180px, calc(100vw - 16px)) !important;
+    left: auto !important;
+    right: 0 !important;
+    z-index: 9400;
+}
+#stcc-pane {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+}
+#stcc-pane[hidden] {
+    display: none !important;
+}
+.stcc-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+}
+.stcc-spacer {
+    flex: 1;
+}
+.stcc-status {
+    font-size: 0.74rem;
+    opacity: 0.7;
+    min-height: 1em;
+}
+.stcc-frame-wrap {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 240px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    background: #0b0d12;
+}
+#stcc-frame {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    display: block;
+    background: #fff;
+}
+
+/* Dead Claude blob idles/expressions must never peek over the hero still. */
+#stcc-frame-wrap iframe.stcc-hide-pvid {
+    /* class toggled from host after load; actual hide is injected into the iframe doc */
+}
+
+/* Modal */
+#stcc-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 10050;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(5, 6, 10, 0.6);
+    backdrop-filter: blur(3px);
+}
+.stcc-modal-card {
+    width: min(860px, calc(100vw - 24px));
+    max-height: calc(100vh - 48px);
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(165deg, rgba(20, 18, 30, 0.98), rgba(12, 12, 20, 0.99));
+    border: 1px solid rgba(255, 140, 200, 0.35);
+    border-radius: 16px;
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.5);
+    color: #e8ecf4;
+}
+.stcc-modal-card header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 14px 8px;
+}
+.stcc-modal-card header b {
+    flex: 1;
+    font-size: 1rem;
+}
+.stcc-modal-body {
+    padding: 0 14px 14px;
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+.stcc-note {
+    font-size: 0.8rem;
+    opacity: 0.75;
+    margin: 0;
+}
+.stcc-search,
+.stcc-row select {
+    font: inherit;
+    font-size: 0.85rem;
+    color: #e8ecf4;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 10px;
+    padding: 6px 10px;
+}
+.stcc-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.82rem;
+}
+.stcc-row select {
+    flex: 1;
+    min-width: 0;
+}
+.stcc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+    gap: 8px;
+}
+.stcc-grid.small {
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    max-height: 260px;
+    overflow: auto;
+}
+.stcc-tile {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 4px;
+    padding: 4px !important;
+    border-radius: 12px !important;
+    text-align: center;
+    white-space: normal !important;
+}
+.stcc-tile img {
+    width: 100%;
+    aspect-ratio: 2 / 3;
+    object-fit: cover;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, 0.05);
+}
+.stcc-tile span {
+    font-size: 0.75rem;
+    line-height: 1.15;
+}
+.stcc-tile[hidden] {
+    display: none !important;
+}
+.stcc-quick {
+    display: flex;
+    gap: 8px;
+}
+.stcc-quick .stcc-tile {
+    width: 96px;
+}
+.stcc-pick {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 12px;
+}
+.stcc-preview {
+    position: relative;
+    aspect-ratio: 2 / 3;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px dashed rgba(255, 140, 200, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.04);
+}
+.stcc-preview img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+.stcc-preview img:not([src]) {
+    display: none;
+}
+.stcc-pick-src {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+.stcc-file {
+    align-self: flex-start;
+}
+.stcc-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    justify-content: flex-end;
+}
+.stcc-actions .stcc-note {
+    flex: 1;
+}
+@media (max-width: 640px) {
+    .stcc-pick {
+        grid-template-columns: 1fr;
+    }
+    .stcc-preview {
+        max-width: 180px;
+    }
+}
+
+
+/* ---------------- stage strip: portrait + Talks meter (four stage modes) ---------------- */
+.stcc-stage {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+    flex: none;
+    margin: 0 0 6px;
+    padding: 8px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 140, 200, 0.28);
+    background: linear-gradient(160deg, rgba(255, 95, 162, 0.12), rgba(192, 107, 255, 0.1) 60%, rgba(255, 255, 255, 0.03));
+    color: #e8ecf4;
+    position: relative;
+    overflow: hidden;
+}
+.stcc-stage-port {
+    flex: none;
+    width: 64px;
+    aspect-ratio: 2 / 3;
+    border-radius: 10px;
+    overflow: hidden;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: width 0.18s ease;
+}
+.stcc-stage-port img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top;
+    display: block;
+}
+.stcc-stage-ph {
+    font-size: 1.2rem;
+    opacity: 0.6;
+}
+.stcc-stage-body {
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    justify-content: center;
+}
+.stcc-stage-head {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 0;
+}
+.stcc-stage-name {
+    font-size: 0.9rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.stcc-stage-title {
+    font-size: 0.68rem;
+    padding: 1px 7px;
+    border-radius: 999px;
+    background: rgba(255, 215, 120, 0.16);
+    color: #ffd978;
+    border: 1px solid rgba(255, 215, 120, 0.35);
+    white-space: nowrap;
+}
+.stcc-stage-modes {
+    display: flex;
+    gap: 2px;
+}
+.stcc-stage-modes button {
+    font: inherit;
+    font-size: 0.78rem;
+    line-height: 1;
+    width: 24px;
+    height: 22px;
+    padding: 0;
+    border-radius: 7px;
+    color: #e8ecf4;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    cursor: pointer;
+}
+.stcc-stage-modes button[aria-pressed='true'] {
+    background: rgba(255, 120, 190, 0.3);
+    border-color: rgba(255, 140, 200, 0.8);
+}
+.stcc-talks {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 8px;
+    align-items: center;
+    font-size: 0.74rem;
+}
+.stcc-lv {
+    font-size: 0.72rem;
+    opacity: 0.9;
+}
+.stcc-lv b {
+    font-size: 0.95rem;
+    color: #ffd978;
+}
+.stcc-talks-bar {
+    position: relative;
+    height: 14px;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    overflow: hidden;
+}
+.stcc-talks-bar i {
+    position: absolute;
+    inset: 0;
+    width: calc(var(--v, 0) * 1%);
+    background: linear-gradient(90deg, #ff5fa2, #c06bff);
+    box-shadow: 0 0 10px rgba(255, 95, 162, 0.55);
+    transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.stcc-talks-bar em {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    padding-left: 7px;
+    font-style: normal;
+    font-size: 0.66rem;
+    letter-spacing: 0.02em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+    pointer-events: none;
+}
+.stcc-talks-n {
+    font-family: ui-monospace, Menlo, Consolas, monospace;
+    font-size: 0.72rem;
+    opacity: 0.85;
+    min-width: 2ch;
+    text-align: right;
+}
+.stcc-stage-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    font-size: 0.68rem;
+    opacity: 0.85;
+}
+.stcc-badges {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+.stcc-badges span {
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    white-space: nowrap;
+}
+
+/* the four stage modes */
+.stcc-stage[data-mode='pill'] .stcc-stage-port {
+    display: none;
+}
+.stcc-stage[data-mode='pill'] .stcc-stage-foot {
+    display: none;
+}
+.stcc-stage[data-mode='thumb'] .stcc-stage-port {
+    width: 64px;
+}
+.stcc-stage[data-mode='half'] {
+    min-height: 150px;
+}
+.stcc-stage[data-mode='half'] .stcc-stage-port {
+    width: 45%;
+    max-width: 220px;
+    aspect-ratio: auto;
+}
+.stcc-stage[data-mode='hero'] {
+    flex-direction: column;
+    padding: 0;
+    min-height: 240px;
+}
+.stcc-stage[data-mode='hero'] .stcc-stage-port {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    max-height: min(52vh, 420px);
+    border-radius: 14px 14px 0 0;
+    border: 0;
+}
+.stcc-stage[data-mode='hero'] .stcc-stage-body {
+    padding: 8px 10px 10px;
+    margin-top: -40px;
+    background: linear-gradient(180deg, rgba(10, 10, 16, 0) 0%, rgba(10, 10, 16, 0.85) 32%, rgba(10, 10, 16, 0.96));
+    position: relative;
+}
+
+/* level-up flash */
+@keyframes stcc-pop {
+    0% { box-shadow: 0 0 0 0 rgba(255, 95, 162, 0.9); }
+    100% { box-shadow: 0 0 0 18px rgba(255, 95, 162, 0); }
+}
+.stcc-stage.stcc-levelup {
+    animation: stcc-pop 0.9s ease-out 1;
+}
+
+/* ---------------- Duet panels: Library (left) and About (right) docks ---------------- */
+:root{--stcc-z:1}
+.stcc-dock{position:fixed;top:var(--topBarBlockSize,36px);bottom:0;z-index:3000;width:300px;max-width:60vw;display:flex;flex-direction:column;background:rgba(14,16,22,.94);backdrop-filter:blur(12px);border-left:1px solid rgba(255,255,255,.1);border-right:1px solid rgba(255,255,255,.1);color:#e8ecf4;font-size:calc(14px * var(--stcc-z));box-shadow:0 0 40px -12px rgba(0,0,0,.8)}
+.stcc-dock-left{left:0}.stcc-dock-right{right:0}
+.stcc-dock .stcc-grip{position:absolute;top:0;bottom:0;width:8px;cursor:col-resize;z-index:2}
+.stcc-dock-left .stcc-grip{right:-4px}.stcc-dock-right .stcc-grip{left:-4px}
+.stcc-dock .stcc-grip:hover{background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--c,#ff7cbf) 40%,transparent),transparent)}
+.stcc-dh{display:flex;align-items:center;gap:8px;padding:8px 10px 8px 14px;border-bottom:1px solid rgba(255,255,255,.08);flex:none}
+.stcc-dh b{font-size:.78em;letter-spacing:.14em;text-transform:uppercase;color:#aab;font-weight:600}
+.stcc-dh .stcc-dsub{flex:1;min-width:0;font-size:.9em;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.stcc-dh .stcc-x{background:none;border:0;color:#aab;font-size:1.1em;cursor:pointer;padding:2px 6px}
+.stcc-db{flex:1;min-height:0;overflow:auto;padding:10px 12px 16px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin}
+.stcc-db h5{margin:8px 0 2px;font-size:.62em;letter-spacing:.14em;text-transform:uppercase;color:#aab;font-weight:600;display:flex;align-items:center;gap:8px}
+.stcc-db h5::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.1)}
+.stcc-empty,.stcc-note{color:#9aa;font-size:.86em;margin:0;line-height:1.4}
+.stcc-lbl{display:block;font-size:.58em;letter-spacing:.12em;text-transform:uppercase;color:#99a}
+.stcc-dock-btns{display:inline-flex;gap:4px;align-items:center;margin-left:6px}
+.stcc-dockbtn{background:none;border:0;color:#aab;font-size:17px;width:32px;height:32px;cursor:pointer;border-radius:8px}
+.stcc-dockbtn:hover,.stcc-dockbtn.active{color:#fff;background:rgba(255,120,190,.2)}
+/* right dock */
+.stcc-hero{position:relative;border-radius:14px;overflow:hidden;height:min(42vh,360px);background:radial-gradient(80% 70% at 50% 100%,color-mix(in srgb,var(--c,#ff7cbf) 35%,transparent),transparent 72%),#0b0d12;flex:none}
+.stcc-hero>img{width:100%;height:100%;object-fit:contain;object-position:50% 100%;display:block}
+.stcc-cap{position:absolute;left:0;right:0;bottom:0;display:flex;align-items:center;gap:10px;padding:26px 12px 10px;background:linear-gradient(transparent,rgba(8,9,14,.92))}
+.stcc-cap b{display:block;font-size:1.05em;font-weight:600}.stcc-cap small{color:#bbc;font-size:.78em}
+.stcc-pfp{position:relative;flex:none;width:40px;height:40px;border-radius:50%;overflow:visible;box-shadow:0 0 0 2px #0b0d12,0 0 0 3.5px var(--c,#ff7cbf)}
+.stcc-pfp img{width:100%;height:100%;border-radius:50%;object-fit:cover;object-position:top;display:block}
+.stcc-pfp i{position:absolute;right:-5px;bottom:-4px;width:16px;height:16px;border-radius:50%;background:#1a1d26;border:1px solid rgba(255,255,255,.2);font-style:normal;font-size:.55em;display:grid;place-items:center;font-weight:700}
+.stcc-talks{display:flex;flex-direction:column;gap:5px;padding:8px 10px;border:1px solid rgba(255,255,255,.1);border-radius:12px;background:rgba(255,255,255,.03)}
+.stcc-tl{display:flex;align-items:baseline;gap:8px}.stcc-tl b{color:var(--c,#ff7cbf)}.stcc-tl span{font-size:.86em}.stcc-tl small{margin-left:auto;color:#99a;font-size:.7em}
+.stcc-bar{display:block;height:6px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}.stcc-bar em{display:block;height:100%;background:linear-gradient(90deg,color-mix(in srgb,var(--c,#ff7cbf) 60%,#fff0),var(--c,#ff7cbf));border-radius:inherit}
+.stcc-rtabs{display:flex;gap:2px;border-bottom:1px solid rgba(255,255,255,.1);overflow-x:auto;scrollbar-width:none}
+.stcc-rtabs button{flex:none;background:none;border:0;border-bottom:2px solid transparent;color:#99a;padding:6px 9px;font-size:.66em;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.stcc-rtabs button.active{color:#fff;border-bottom-color:var(--c,#ff7cbf)}
+.stcc-rt{display:flex;flex-direction:column;gap:8px}
+.stcc-wc p{margin:2px 0 0;font-size:.9em;line-height:1.45;color:#dde}
+.stcc-tags{display:flex;flex-wrap:wrap;gap:4px}.stcc-tags i{font-style:normal;font-size:.72em;padding:2px 8px;border-radius:999px;border:1px solid color-mix(in srgb,var(--c,#ff7cbf) 45%,transparent);color:#eef}
+.stcc-nums{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:0 14px}.stcc-nums>div{display:flex;flex-direction:column;gap:1px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.08)}.stcc-nums b{font-size:.95em;font-weight:600;overflow-wrap:anywhere}.stcc-nums small{color:#99a;font-size:.72em}
+.stcc-vit{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));column-gap:24px}
+.stcc-vr{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;align-items:baseline;padding:6px 0 7px;border-bottom:1px solid rgba(255,255,255,.08)}.stcc-vr b{font-weight:500;font-size:.9em;line-height:1.3;overflow-wrap:anywhere}
+.stcc-qk{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;padding:8px 0 9px;border-bottom:1px solid rgba(255,255,255,.08)}.stcc-qk .stcc-lbl{color:var(--c,#ff7cbf)}.stcc-qk p{margin:0;font-size:.88em;line-height:1.45;color:#dde}
+.stcc-inner{margin:0;padding:0 0 0 16px;display:flex;flex-direction:column;gap:5px;font-style:italic;color:#dde;font-size:.92em}
+/* left dock */
+.stcc-lhead{display:flex;align-items:center;gap:8px;font-size:.78em;color:#aab}.stcc-lhead span{flex:1}
+.stcc-up{cursor:pointer;font-size:.9em;padding:4px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06)}.stcc-up:hover{border-color:var(--c,#ff7cbf)}
+.stcc-drop{border:1px dashed rgba(255,255,255,.22);border-radius:12px;padding:10px;text-align:center;font-size:.8em;color:#99a}.stcc-drop.over{border-color:var(--c,#ff7cbf);color:#fff;background:color-mix(in srgb,var(--c,#ff7cbf) 12%,transparent)}
+.stcc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px}
+.stcc-tile{margin:0;border-radius:10px;overflow:hidden;border:1px solid rgba(255,255,255,.1);background:repeating-conic-gradient(#1a1e28 0 25%,#141720 0 50%) 0 0/14px 14px;cursor:pointer;display:flex;flex-direction:column;transition:transform .15s,border-color .15s}
+.stcc-tile:hover{transform:translateY(-2px);border-color:var(--c,#ff7cbf)}
+.stcc-tile img,.stcc-tile video{width:100%;aspect-ratio:3/4;object-fit:contain;object-position:50% 100%;display:block;background:rgba(0,0,0,.25)}
+.stcc-tile figcaption{padding:4px 6px;display:flex;flex-direction:column;background:rgba(10,12,18,.85)}.stcc-tile b{font-size:.72em;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.stcc-tile small{font-size:.62em;color:#99a}
+#stcc-peek{position:fixed;z-index:4000;pointer-events:none;width:min(40vw,420px);padding:6px;border-radius:14px;background:#14161e;border:1px solid rgba(255,255,255,.14);box-shadow:0 24px 60px -14px rgba(0,0,0,.9)}
+#stcc-peek img,#stcc-peek video{width:100%;max-height:min(56vh,540px);object-fit:contain;border-radius:10px;display:block;background:repeating-conic-gradient(#1a1e28 0 25%,#141720 0 50%) 0 0/16px 16px}
+#stcc-ctx{position:fixed;z-index:4001;display:flex;flex-direction:column;min-width:200px;padding:6px;border-radius:12px;background:#14161e;border:1px solid rgba(255,255,255,.14);box-shadow:0 20px 50px -12px rgba(0,0,0,.9)}
+#stcc-ctx button{background:none;border:0;color:#e8ecf4;text-align:left;padding:7px 10px;border-radius:8px;font:inherit;cursor:pointer}#stcc-ctx button:hover{background:rgba(255,120,190,.18)}
+body.stcc-left-open #sheld{margin-left:var(--stcc-left-w,0)}
+
+
+/* ---------- standalone mode: no st-duet-stage installed, so we bring our own right drawer ---------- */
+#duet-side-panel.stcc-standalone {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: min(560px, 100vw);
+    display: none;
+    flex-direction: column;
+    background: linear-gradient(var(--SmartThemeBlurTintColor, rgba(20, 20, 26, 0.96)), var(--SmartThemeBlurTintColor, rgba(20, 20, 26, 0.96))), #0b0d12;
+    color: var(--SmartThemeBodyColor, #eee);
+    border-left: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.15));
+    box-shadow: -12px 0 40px rgba(0, 0, 0, 0.5);
+    z-index: 9300;
+    backdrop-filter: blur(var(--SmartThemeBlurStrength, 10px));
+}
+#duet-side-panel.stcc-standalone.open {
+    display: flex;
+}
+#duet-side-panel.stcc-standalone.stcc-on {
+    height: 100vh !important;
+    max-height: 100vh !important;
+}
+#duet-side-panel.stcc-standalone [data-stcc-tab="rail"] {
+    display: none;
+}
+.stcc-sa-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--SmartThemeBorderColor, rgba(255, 255, 255, 0.15));
+    font-size: 0.95em;
+}
+#duet-side-panel.stcc-on > .stcc-sa-head {
+    display: flex !important;
+}
+.stcc-settings .stcc-ver {
+    display: block;
+    margin-top: 6px;
+    opacity: 0.6;
+}
