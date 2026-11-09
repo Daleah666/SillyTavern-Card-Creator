@@ -14,7 +14,7 @@
 import './autoupdate.js';   // updates itself from GitHub on each refresh, and shows the repo's 📣 board
 import { bootPanels } from './panels.js';
 const MODULE = 'st-card-creator';
-const VERSION = '0.3.2';
+const VERSION = '0.3.3';
 const PANEL_ID = 'duet-side-panel';
 const PANEL_NAME = 'Card creator';
 const CREATOR_URL = new URL('./creator/index.html', import.meta.url).href;

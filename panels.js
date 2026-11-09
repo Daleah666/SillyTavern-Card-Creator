@@ -55,7 +55,9 @@ function dock(side) {
 function applySize() { const p = prefs(); const l = document.getElementById('stcc-dock-left'), r = document.getElementById('stcc-dock-right'); if (l) l.style.width = p.leftW + 'px'; if (r) r.style.width = p.rightW + 'px'; document.documentElement.style.setProperty('--stcc-z', String(p.zoom)); }
 function toggle(side, on) {
     const p = prefs(); const cur = side === 'left' ? p.left : p.right; const v = on === undefined ? !cur : !!on;
-    if (side === 'left') p.left = v; else p.right = v; save();
+    if (side === 'left') p.left = v; else p.right = v;
+    if (v && innerWidth <= 820) { const o = side === 'left' ? 'right' : 'left'; if (p[o]) { p[o] = false; const od = document.getElementById(`stcc-dock-${o}`); if (od) od.hidden = true; document.body.classList.remove(`stcc-${o}-open`); } }   // 0.3.3: one dock at a time on a phone
+    save();
     const el = dock(side); el.hidden = !v; document.body.classList.toggle(`stcc-${side}-open`, v);
     document.querySelectorAll(`[data-stcc-dock="${side}"]`).forEach((b) => b.classList.toggle('active', v));
     if (v) render(side);
@@ -252,6 +254,7 @@ function scheduleRender() { clearTimeout(renderT); renderT = setTimeout(() => { 
 export function bootPanels() {
     try {
         const p = prefs(); ensureButtons(); ensurePeek(); applySize();
+        if (innerWidth <= 820) { p.left = false; p.right = false; save(); }   // 0.3.3: a phone opens with the chat, not the docks
         if (p.left) toggle('left', true); if (p.right) toggle('right', true);
         const c = ctx(), es = c.eventSource, et = c.eventTypes || c.event_types;
         if (es && et) { ['CHAT_CHANGED', 'MESSAGE_RECEIVED', 'MESSAGE_SENT', 'CHARACTER_MESSAGE_RENDERED', 'USER_MESSAGE_RENDERED', 'MESSAGE_DELETED', 'GENERATION_ENDED', 'SETTINGS_UPDATED'].forEach((k) => { if (et[k]) es.on(et[k], () => { if (k === 'CHAT_CHANGED') { CHATS.t = 0; actLines = -1; } scheduleRender(); }); }); if (et.GENERATION_STARTED) es.on(et.GENERATION_STARTED, () => document.body.classList.add('stcc-generating')); if (et.GENERATION_ENDED) es.on(et.GENERATION_ENDED, () => document.body.classList.remove('stcc-generating')); }
