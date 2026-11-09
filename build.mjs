@@ -52,8 +52,10 @@ patch(
             'try{return(CHARS[id]&&CHARS[id].card)||""}catch(e){return""}},' +
         'stampStAvatar:(avatar)=>{try{if(!card)return false;cs().stAvatar=String(avatar||"");CHARS[activeId]=charDoc();try{renderCharMenu()}catch(e){}return true}catch(e){return false}},' +
         'forgetChar:(id)=>{id=String(id||"");if(!id||id==="redz"||id===activeId)return false;delete CHARS[id];try{localStorage.removeItem(draftKey(id))}catch(e){}try{if(tagDb)tagDb.doc("cards/"+id).delete()}catch(e){}try{renderCharMenu()}catch(e){}return true},' +
-        'loadCard:(id,c)=>{try{stashDraft()}catch(e){}putOnCard(id,c);try{applyKindScopes()}catch(e){}saved="";CHARS[id]=charDoc();try{renderCharMenu()}catch(e){}try{syncViews()}catch(e){}return saveChar()}' +
-    '})}catch(e){console.warn("[card creator] host hook failed",e)}' +
+        'loadCard:(id,c)=>{try{stashDraft()}catch(e){}putOnCard(id,c);try{applyKindScopes()}catch(e){}saved="";CHARS[id]=charDoc();try{renderCharMenu()}catch(e){}try{syncViews()}catch(e){}return saveChar()},' +
+        'elfheimGet:()=>{try{if(!card)return null;const st=cs();return {id:activeId,name:(card.data&&card.data.name)||"",portrait:st.portrait||"",stAvatar:st.stAvatar||"",profile:Object.assign({},st.profile||{}),elfheim:st.elfheim?JSON.parse(JSON.stringify(st.elfheim)):null}}catch(e){return null}},' +
+        'elfheimApply:(patch)=>{try{if(!card||!patch)return false;checkpoint();const st=cs();const p=st.profile=st.profile||{};const keys=["rpg_mode","dnd_race","dnd_class","dnd_sub","dnd_level","dnd_bg","dnd_align","dnd_str","dnd_dex","dnd_con","dnd_int","dnd_wis","dnd_cha","dnd_hp","dnd_ac","dnd_speed","dnd_skills","dnd_feats","dnd_spells","dnd_gear"];if(patch.profile&&typeof patch.profile==="object")keys.forEach(k=>{if(patch.profile[k]!==undefined)p[k]=patch.profile[k]});if(patch.rpg_mode)p.rpg_mode=patch.rpg_mode;if(patch.elfheim&&typeof patch.elfheim==="object")st.elfheim=JSON.parse(JSON.stringify(patch.elfheim));if(patch.name)card.data.name=String(patch.name).slice(0,80);if(patch.portrait)st.portrait=String(patch.portrait);if(patch.addRpg){st.kinds=Array.isArray(st.kinds)&&st.kinds.length?st.kinds:["companion"];if(!st.kinds.includes("rpg"))st.kinds.push("rpg")}try{stashDraft()}catch(e){}try{saveChar()}catch(e){}try{render()}catch(e){}return true}catch(e){return false}}}' +
+    ')}catch(e){console.warn("[card creator] host hook failed",e)}' +
     'window.__cardHost={',
     'hook',
 );

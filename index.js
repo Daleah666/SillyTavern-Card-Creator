@@ -13,8 +13,24 @@
 
 import './autoupdate.js';   // updates itself from GitHub on each refresh, and shows the repo's 📣 board
 import { bootPanels } from './panels.js';
+import {
+    applyBeat,
+    applyLook,
+    assignScores,
+    blankView,
+    commitCreation,
+    currentBeat,
+    lookById,
+    renderPanel,
+    rollCheck,
+    rollScores,
+    SHEET_KEYS,
+    STANDARD_ARRAY,
+    syncForm,
+    viewFromCard,
+} from './elfheim.js';
 const MODULE = 'st-card-creator';
-const VERSION = '0.3.3';
+const VERSION = '0.3.4';
 const PANEL_ID = 'duet-side-panel';
 const PANEL_NAME = 'Card creator';
 const CREATOR_URL = new URL('./creator/index.html', import.meta.url).href;
@@ -347,6 +363,233 @@ function wireStageEvents() {
     if (!stageTimer) stageTimer = setInterval(renderStage, 4000); // safety net when an event is missed
 }
 
+/* ---------------- Elfheim side tab ---------------- */
+const elfAsset = (file) => new URL(`./creator/elfheim/${file}`, import.meta.url).href;
+let elfView = null;
+let elfSaving = false;
+
+function elfRoot() {
+    return document.getElementById('stcc-elfheim');
+}
+
+async function loadElfView() {
+    const ch = currentChar();
+    let hooked = null;
+    if (typeof hook?.elfheimGet === 'function') {
+        try { hooked = hook.elfheimGet(); } catch { hooked = null; }
+    }
+    const hookMatches = hooked && (!ch?.avatar || !hooked.stAvatar || hooked.stAvatar === ch.avatar);
+    if (hookMatches) {
+        const portrait = hooked.portrait || (ch?.avatar ? avatarUrl(ch.avatar) : '');
+        return viewFromCard({
+            source: 'hook',
+            avatar: hooked.stAvatar || ch?.avatar || '',
+            id: hooked.id || '',
+            name: hooked.name || ch?.name || '',
+            portrait,
+            ownPortrait: ch?.avatar ? avatarUrl(ch.avatar) : portrait,
+            profile: hooked.profile || {},
+            elfheim: hooked.elfheim,
+        });
+    }
+    if (ch) {
+        const card = toV2(ch);
+        const st = card.data.extensions.companion_stage;
+        const portrait = st.portrait || avatarUrl(ch.avatar);
+        return viewFromCard({
+            source: 'st',
+            avatar: ch.avatar,
+            id: '',
+            name: card.data.name || ch.name || '',
+            portrait,
+            ownPortrait: avatarUrl(ch.avatar),
+            profile: st.profile || {},
+            elfheim: st.elfheim,
+        });
+    }
+    const draft = settings().elfheimDraft;
+    if (draft && typeof draft === 'object') {
+        return viewFromCard({
+            source: 'draft',
+            name: draft.name || '',
+            portrait: draft.portrait || '',
+            ownPortrait: draft.ownPortrait || '',
+            profile: draft.profile || {},
+            elfheim: draft.elfheim,
+        });
+    }
+    return blankView();
+}
+
+function paintElf() {
+    const root = elfRoot();
+    if (!root || !elfView) return;
+    root.innerHTML = renderPanel(elfView, elfAsset);
+}
+
+async function showElfheim() {
+    try {
+        elfView = await loadElfView();
+    } catch (e) {
+        console.error(`[${MODULE}] elfheim load failed`, e);
+        elfView = blankView();
+        elfView.note = "Her sheet couldn't be read.";
+    }
+    paintElf();
+}
+
+async function persistElf(view) {
+    const profile = {};
+    for (const key of SHEET_KEYS) {
+        if (view.profile?.[key] !== undefined) profile[key] = view.profile[key];
+    }
+    profile.rpg_mode = 'elfheim';
+    const patch = {
+        profile,
+        elfheim: view.elfheim,
+        name: view.name,
+        portrait: view.portrait,
+        rpg_mode: 'elfheim',
+        addRpg: true,
+    };
+    let hooked = null;
+    try { hooked = typeof hook?.elfheimGet === 'function' ? hook.elfheimGet() : null; } catch { hooked = null; }
+    const sameCard = !!(hooked && (view.source === 'hook' || (hooked.stAvatar && hooked.stAvatar === view.avatar)));
+    let onCard = false;
+    if (sameCard && typeof hook?.elfheimApply === 'function') {
+        try { onCard = !!hook.elfheimApply(patch); } catch (e) { console.warn(`[${MODULE}] elfheim apply failed`, e); }
+    }
+    const avatar = view.avatar || (onCard && hooked?.stAvatar) || '';
+    if (avatar) {
+        const live = (ctx().characters || []).find((c) => c.avatar === avatar) || (currentChar()?.avatar === avatar ? currentChar() : null);
+        let card = null;
+        if (onCard && typeof hook?.exportJson === 'function') {
+            try { card = JSON.parse(hook.exportJson()); } catch { card = null; }
+        }
+        if (!card && live) card = toV2(live);
+        if (card) {
+            const st = card.data.extensions.companion_stage;
+            st.profile = { ...(st.profile || {}), ...profile, rpg_mode: 'elfheim' };
+            st.elfheim = JSON.parse(JSON.stringify(view.elfheim));
+            if (view.portrait) st.portrait = view.portrait;
+            if (view.name) card.data.name = view.name;
+            st.kinds = Array.isArray(st.kinds) && st.kinds.length ? st.kinds : ['companion'];
+            if (!st.kinds.includes('rpg')) st.kinds.push('rpg');
+            const id = (typeof hook?.activeId === 'function' && hook.activeId()) || view.id || `elfheim-${slug(view.name || avatar)}`;
+            const writer = onCard && typeof hook?.exportJson === 'function'
+                ? hook
+                : { exportJson: () => JSON.stringify(card), activeId: () => id, stampStAvatar() {} };
+            const file = await saveToSt({ hook: writer, id, target: avatar, picture: avatarUrl(avatar), link: onCard });
+            view.avatar = file;
+            view.source = 'st';
+            return 'card';
+        }
+    }
+    if (onCard) {
+        view.source = 'hook';
+        return 'creator';
+    }
+    settings().elfheimDraft = {
+        name: view.name,
+        portrait: view.portrait,
+        ownPortrait: view.ownPortrait,
+        profile: view.profile,
+        elfheim: view.elfheim,
+    };
+    saveSettings();
+    view.source = 'draft';
+    return 'draft';
+}
+
+function elfNoteFor(where) {
+    if (where === 'card') return 'Written onto her card.';
+    if (where === 'creator') return 'Written on the open card. Save to SillyTavern from the Card creator tab to file the picture.';
+    return 'Saved in this browser. Open a character to write it onto her card.';
+}
+
+async function onElfClick(ev) {
+    const root = elfRoot();
+    if (!root || !elfView || elfSaving) return;
+    const lookBtn = ev.target.closest('[data-look]');
+    const frameBtn = ev.target.closest('[data-frame]');
+    const act = ev.target.closest('[data-act]');
+    if (!lookBtn && !frameBtn && !act) return;
+    syncForm(root, elfView);
+    if (lookBtn) {
+        const id = lookBtn.dataset.look;
+        if (id === 'own') {
+            elfView.elfheim.look = '';
+            elfView.portrait = elfView.ownPortrait || '';
+        } else {
+            const look = lookById(id);
+            if (!look) return;
+            const own = elfView.ownPortrait;
+            const source = elfView.source;
+            const avatar = elfView.avatar;
+            const cardId = elfView.id;
+            elfView = applyLook(elfView, look);
+            elfView.ownPortrait = own;
+            elfView.source = source;
+            elfView.avatar = avatar;
+            elfView.id = cardId;
+            elfView.portrait = elfAsset(look.file);
+        }
+        paintElf();
+        return;
+    }
+    if (frameBtn) {
+        const next = frameBtn.dataset.frame === 'rpg' ? 'rpg' : 'isekai';
+        if (elfView.elfheim.frame !== next) elfView.elfheim.beat = 0;
+        elfView.elfheim.frame = next;
+        paintElf();
+        return;
+    }
+    if (act.dataset.act === 'array') {
+        assignScores(elfView.profile, STANDARD_ARRAY);
+        elfView.note = 'Standard array: 15, 14, 13, 12, 10, 8.';
+        paintElf();
+        return;
+    }
+    if (act.dataset.act === 'roll') {
+        const totals = rollScores();
+        assignScores(elfView.profile, totals);
+        elfView.note = `Rolled 4d6, dropped the lowest: ${totals.join(', ')}.`;
+        paintElf();
+        return;
+    }
+    if (act.dataset.act === 'again') {
+        elfView.elfheim.beat = 0;
+        elfView.note = 'The road starts again.';
+        paintElf();
+        return;
+    }
+    if (act.dataset.act === 'check') {
+        const beat = currentBeat(elfView.elfheim);
+        if (!beat) return;
+        applyBeat(elfView, beat, rollCheck(elfView.profile, beat));
+    } else if (act.dataset.act === 'confirm') {
+        commitCreation(elfView);
+        if (!String(elfView.name || '').trim()) {
+            elfView.note = 'Give her a name, then confirm.';
+            paintElf();
+            return;
+        }
+    } else return;
+    elfSaving = true;
+    paintElf();
+    try {
+        const rolled = act.dataset.act === 'check' ? elfView.note : '';
+        const where = await persistElf(elfView);
+        elfView.note = [rolled, elfNoteFor(where)].filter(Boolean).join(' ');
+    } catch (e) {
+        console.error(`[${MODULE}] elfheim save failed`, e);
+        elfView.note = `Couldn't write the card: ${e?.message || e}`;
+    } finally {
+        elfSaving = false;
+        paintElf();
+    }
+}
+
 /* ---------------- side panel tab ---------------- */
 let activeTab = 'rail';
 let frameLoading = false;
@@ -364,7 +607,8 @@ function ensureTab() {
         tabs.className = 'stcc-tabs';
         tabs.innerHTML = `
             <button type="button" data-stcc-tab="rail" class="active" title="Back to the Duet rail">Talking-To</button>
-            <button type="button" data-stcc-tab="creator" title="Make or edit character cards"><i class="fa-solid fa-id-card"></i> Card creator</button>`;
+            <button type="button" data-stcc-tab="creator" title="Make or edit character cards"><i class="fa-solid fa-id-card"></i> Card creator</button>
+            <button type="button" data-stcc-tab="elfheim" title="Elfheim character sheet and adventure">Elfheim</button>`;
         const pane = document.createElement('section');
         pane.id = 'stcc-pane';
         pane.hidden = true;
@@ -379,8 +623,13 @@ function ensureTab() {
             <div class="stcc-status" id="stcc-status">Not loaded yet</div>
             <div class="stcc-frame-wrap" id="stcc-frame-wrap"></div>`;
         const anchor = el.querySelector('#duet-rail-body') || el.querySelector('.duet-sp-head')?.nextSibling || el.firstElementChild?.nextSibling;
+        const elf = document.createElement('section');
+        elf.id = 'stcc-elfheim';
+        elf.hidden = true;
+        elf.addEventListener('click', (ev) => { onElfClick(ev); });
         el.insertBefore(tabs, anchor || null);
         el.insertBefore(pane, anchor || null);
+        el.insertBefore(elf, anchor || null);
         ensureStage(el);
         tabs.addEventListener('click', (ev) => {
             const b = ev.target.closest('[data-stcc-tab]');
@@ -407,18 +656,22 @@ function applyTabState() {
     const el = panel();
     if (!el) return;
     el.classList.toggle('stcc-on', activeTab === 'creator');
+    el.classList.toggle('stcc-elf', activeTab === 'elfheim');
     el.querySelectorAll('[data-stcc-tab]').forEach((b) => b.classList.toggle('active', b.getAttribute('data-stcc-tab') === activeTab));
     const pane = el.querySelector('#stcc-pane');
     if (pane) pane.hidden = activeTab !== 'creator';
+    const elf = el.querySelector('#stcc-elfheim');
+    if (elf) elf.hidden = activeTab !== 'elfheim';
     applyWide();
     renderStage();
 }
 
 function setTab(tab) {
-    activeTab = tab === 'creator' ? 'creator' : 'rail';
+    activeTab = tab === 'creator' ? 'creator' : tab === 'elfheim' ? 'elfheim' : 'rail';
     if (activeTab === 'rail' && panel()?.classList.contains('stcc-standalone')) return closeStandalone();
     applyTabState();
     if (activeTab === 'creator') loadFrame(false);
+    if (activeTab === 'elfheim') showElfheim();
 }
 
 function setStatus(text) {
@@ -1161,7 +1414,7 @@ async function openSaveDialog() {
     });
 }
 
-async function saveToSt({ hook: h, id, target, picture }) {
+async function saveToSt({ hook: h, id, target, picture, link = true }) {
     if (!picture) throw new Error('Pick a picture first.');
     const card = JSON.parse(h.exportJson());
     if (card?.spec !== 'chara_card_v2' || !card.data?.name) throw new Error('The creator returned an unexpected card.');
@@ -1197,11 +1450,13 @@ async function saveToSt({ hook: h, id, target, picture }) {
         await api('/api/characters/merge-attributes', restore).catch((e) => console.warn(`[${MODULE}] restore chat link failed`, e));
     }
 
-    settings().links[id] = avatar;
-    for (const [otherId, a] of Object.entries(settings().links)) {
-        if (a === avatar && otherId !== id) delete settings().links[otherId];
+    if (link) {
+        settings().links[id] = avatar;
+        for (const [otherId, a] of Object.entries(settings().links)) {
+            if (a === avatar && otherId !== id) delete settings().links[otherId];
+        }
+        saveSettings();
     }
-    saveSettings();
     try {
         h.stampStAvatar?.(avatar);
     } catch (e) {
