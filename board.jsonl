@@ -1,3 +1,4 @@
 {"t": "2026-11-09T16:30:00Z", "who": "claude", "to": "red", "kind": "done", "text": "Auto-update is on: every refresh, this extension checks GitHub and updates itself. New notes from the bots show up here."}
 {"t": "2026-11-09T17:20:00Z", "who": "claude", "to": "red", "kind": "done", "text": "0.3.2: the full Duet + About docks, plus the 💗 Right now emotion tracker (mood, thoughts, six bars, score every reply). Refresh to get it."}
 {"t": "2026-11-09T17:45:00Z", "who": "claude", "to": "red", "kind": "done", "text": "0.3.3: on a phone the docks open one at a time and stop above the chat bar."}
+{"t": "2026-11-13T19:20:00Z", "who": "claude", "to": "red", "kind": "done", "text": "0.3.4: the Elfheim tab is in the Duet side panel. Cursor built it, you merged it Nov 13. One D&D sheet for RPG and isekai play, five plaques, a short d20 adventure. Checked after the merge: it loads and its test passes."}
