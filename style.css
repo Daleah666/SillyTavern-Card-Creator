@@ -1,6 +1,7 @@
 /* Card creator tab inside #duet-side-panel (owned by st-duet-stage; styled from here only). */
 .stcc-tabs {
     display: flex;
+    flex-wrap: wrap;
     gap: 6px;
     flex: none;
     margin: 0 0 2px;
@@ -48,6 +49,25 @@
    Force a definite panel height — without it, flex children collapse to ~padding
    (top/bottom stretch can lose to content-sized height when the rail body is hidden). */
 #duet-side-panel.stcc-on > *:not(.duet-sp-resize):not(#stcc-tabs):not(#stcc-pane):not(#stcc-stage):not(.stcc-sa-head) {
+    display: none !important;
+}
+#duet-side-panel.stcc-elf > *:not(.duet-sp-resize):not(#stcc-tabs):not(#stcc-elfheim):not(.stcc-sa-head) {
+    display: none !important;
+}
+#duet-side-panel.stcc-elf {
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    height: calc(100vh - 48px) !important;
+    max-height: calc(100vh - 48px) !important;
+}
+#stcc-elfheim {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
+    padding: 4px 2px 16px;
+}
+#stcc-elfheim[hidden] {
     display: none !important;
 }
 #duet-side-panel.stcc-on {
@@ -636,6 +656,49 @@ body.stcc-left-open #sheld{margin-left:var(--stcc-left-w,0)}
 .stcc-db > * { flex-shrink: 0; }
 /* 0.3.2: a hidden About tab stays hidden (a section rule made every tab show at once) */
 .stcc-dock [hidden] { display: none !important; }
+
+/* Elfheim plaque: the five portraits sit at side-panel size, stats in the gold card under them */
+.elf-panel { display: grid; gap: 8px; color: #f4efe4; }
+.elf-plaque { margin: 0; display: grid; justify-items: center; gap: 8px; }
+.elf-plaque img, .elf-ph {
+    width: 150px; height: 200px; object-fit: cover; object-position: top center;
+    border-radius: 12px; border: 1px solid #e6c98a;
+    box-shadow: 0 10px 24px -16px #000;
+    background: #111;
+}
+.elf-ph { display: grid; place-items: center; color: #b9a27a; font-size: 0.75rem; }
+.elf-plaque figcaption {
+    width: 100%; box-sizing: border-box;
+    display: grid; gap: 3px; padding: 8px 10px;
+    border: 1px solid #e6c98a; border-radius: 10px;
+    background: linear-gradient(180deg, rgba(72, 48, 16, 0.92), rgba(18, 12, 6, 0.94));
+}
+.elf-plaque b { font-size: 0.92rem; color: #ffe7ad; }
+.elf-plaque small { color: #f0d48a; font-size: 0.75rem; }
+.elf-line { font-size: 0.75rem; color: #f6edd8; }
+.elf-origin { margin: 0; font-size: 0.75rem; line-height: 1.4; color: #e7dcc4; }
+.elf-step { margin: 4px 0 0; font: 600 0.68rem ui-monospace, monospace; letter-spacing: 0.08em; text-transform: uppercase; color: #e6c98a; }
+.elf-row { display: flex; flex-wrap: wrap; gap: 4px; }
+.elf-row button, .elf-panel .elf-go, #stcc-elfheim button {
+    font: inherit; font-size: 0.75rem; color: #f6edd8;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(230, 201, 138, 0.45);
+    border-radius: 999px; padding: 3px 9px; cursor: pointer;
+}
+#stcc-elfheim button[aria-pressed="true"] { background: rgba(230, 201, 138, 0.28); color: #fff8e6; }
+.elf-panel .elf-go { justify-self: start; background: linear-gradient(135deg, #c9a15b, #8a6230); border-color: transparent; color: #1a1208; font-weight: 700; }
+.elf-abs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 4px; }
+.elf-ab { display: grid; grid-template-columns: auto 1fr auto; gap: 4px; align-items: center; font-size: 0.68rem; color: #e6c98a; }
+.elf-ab input, .elf-lab input, .elf-lab select, .elf-lab textarea {
+    width: 100%; box-sizing: border-box; font: inherit; font-size: 0.78rem; color: #f6edd8;
+    background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(230, 201, 138, 0.35); border-radius: 8px; padding: 4px 6px;
+}
+.elf-ab input { min-width: 0; }
+.elf-ab b { color: #fff8e6; font-size: 0.75rem; }
+.elf-lab { display: grid; gap: 2px; font-size: 0.68rem; color: #e6c98a; }
+.elf-note { margin: 0; font-size: 0.75rem; color: #f0d48a; }
+.elf-beat { margin: 0; font-size: 0.8rem; line-height: 1.35; }
+.elf-log { margin: 0; padding-left: 1.1rem; display: grid; gap: 4px; font-size: 0.74rem; color: #f6edd8; }
 
 /* 0.3.3: a dock never covers SillyTavern's chat bar: on a phone it stops above it */
 @media (max-width: 820px) {
